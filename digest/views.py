@@ -2,6 +2,7 @@ from .models import Post, Digest
 from .serializers import DigestSerializer
 from django.http import Http404
 from django.contrib.auth.models import User
+from django.db.models import Prefetch
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -10,7 +11,7 @@ class CreateDigestView(APIView):
     Фильтрует записи для пользователя, создает новый дайджест и отдает его в json.
     Обрабатывает GET-запрос на URL вида api/digest/?userid=2&rating=8, где:
     userid - уникальный айди пользователя
-    rating - значение рейтинга для фильтра записей, которые имеют значение рейтинга выше, чем указанный
+    rating - значение рейтинга для фильтра записей
     """
     def get_user(self, id): # Функция для проверки и получения объекта пользователя по его id
         try:
@@ -25,9 +26,16 @@ class CreateDigestView(APIView):
         else:
             rating = 0
         user = self.get_user(userid)
-        posts = Post.objects.filter(subscription__user=userid).filter(rating__gt=rating) # Кверисет постов с фильтрами - из подписок этого пользователя и рейтинг постов вышем, чем указанный
+        
+        # Кверисет постов с фильтрами - из подписок этого пользователя и рейтинг постов вышем, чем указанный, исключаем посты, если пользователь их уже видел 
+        posts = Post.objects.exclude(viewed__id=userid).filter(subscription__user=userid).filter(rating__gt=rating) 
+        
         new_digest = Digest(user=user)
         new_digest.save() # Сохраняем созданный дайджест
         new_digest.posts.set(posts) # Добавляем в созданный дайджест все отфильтрованные посты
+        
+        for post in posts:
+            post.viewed.add(user) # Отмечаем выбранные для дайджеста посты как просмотренные этим пользователем
+
         serializer = DigestSerializer(new_digest) # Сериализуем созданный дайджест в формат json
         return Response(serializer.data)

@@ -17,7 +17,7 @@ class Post(models.Model):
     text = models.TextField(max_length=2000)
     published = models.DateTimeField(auto_now_add=True)
     rating = models.SmallIntegerField(default=0)
-    viewed = models.ManyToManyField(User, blank=True)
+    viewed = models.ManyToManyField(User, related_name='viewed', blank=True)
     
     class Meta:
         ordering = ['rating']
