@@ -47,7 +47,7 @@ class CreateDigestView(APIView):
 
         # Кверисет постов с фильтрами - подписки этого пользователя и
         # рейтинг постов выше или равно, чем указанный, исключая посты,
-        # если пользователь их уже видел 
+        # если пользователь их уже видел
         posts = Post.objects.exclude(viewed__id=userid).filter(subscription__user=userid).filter(rating__gte=rating)
 
         new_digest = Digest(user=user)
