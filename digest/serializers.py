@@ -1,4 +1,4 @@
-from .models import Digest 
+from .models import Digest
 from rest_framework import serializers
 
 

@@ -28,11 +28,11 @@ class CreateDigestView(APIView):
 
     @swagger_auto_schema(manual_parameters=[
             openapi.Parameter('userid', openapi.IN_QUERY,
-                                description='Уникальный айди пользователя',
-                                type=openapi.TYPE_INTEGER, required=True),
+                              description='Уникальный айди пользователя',
+                              type=openapi.TYPE_INTEGER, required=True),
             openapi.Parameter('rating', openapi.IN_QUERY,
-                                description='Значение рейтинга',
-                                type=openapi.TYPE_INTEGER)])
+                              description='Значение рейтинга',
+                              type=openapi.TYPE_INTEGER)])
     def get(self, request, format=None):
         # Получаем значение id из параметров URL-запроса
         userid = self.request.query_params.get('userid')
